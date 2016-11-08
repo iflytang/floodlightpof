@@ -1,2 +1,2 @@
-This is POF protocol library in ONOS.
+This is the POF protocol library in ONOS.
 
