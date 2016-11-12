@@ -2,21 +2,42 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+
     <parent>
-        <artifactId>onos</artifactId>
-        <groupId>org.onosproject</groupId>
-        <version>1.6.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <artifactId>oss-parent</artifactId>
+        <groupId>org.sonatype.oss</groupId>
+        <version>7</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
-    <artifactId>onos-floodlightpof</artifactId>
-    <packaging>bundle</packaging>
-
+    <groupId>com.github.USTC-INFINITELAB</groupId>
+    <artifactId>floodlightpof</artifactId>
+    <packaging>jar</packaging>
+    <url>https://github.com/USTC-INFINITELAB/floodlightpof</url>
+    <name>onos-floodlightpof</name>
+    <version>1.0.0.onos-SNAPSHOT</version>
     <description>onos pof controller protocol</description>
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+	<connection> scm:git:https://github.com/USTC-INFINITELAB/floodlightpof.git</connection>
+        <developerConnection> scm:git:https://github.com/USTC-INFINITELAB/floodlightpof.git</developerConnection>
+        <url>https://github.com/USTC-INFINITELAB/floodlightpof.git</url>
+        <tag>floodlightpof-1.0.0</tag>
+    </scm>  
 
     <distributionManagement>
-        <snapshotRepository>
+         <repository>
+	    <id>releases</id>
+	    <name>Sonatype Release Repository</name>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+	 <snapshotRepository>
             <id>ossrh</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
@@ -36,6 +57,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty</artifactId>
+            <version>3.10.5.Final</version>
         </dependency>
     </dependencies>
 
@@ -72,4 +94,64 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!--<plugin>-->
+                        <!--<groupId>org.apache.maven.plugins</groupId>-->
+                        <!--<artifactId>maven-javadoc-plugin</artifactId>-->
+                        <!--<executions>-->
+                            <!--<execution>-->
+                                <!--<id>attach-javadocs</id>-->
+                                <!--<goals>-->
+                                    <!--<goal>jar</goal>-->
+                                <!--</goals>-->
+                            <!--</execution>-->
+                        <!--</executions>-->
+                    <!--</plugin>-->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.5</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
