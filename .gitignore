@@ -16,6 +16,6 @@ localDB
 localDB.*
 .buckd
 buck-out
-
+*.swp
 /bin/
 
