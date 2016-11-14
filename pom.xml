@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.USTC-INFINITELAB</groupId>
     <artifactId>floodlightpof</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <url>https://github.com/USTC-INFINITELAB/floodlightpof</url>
     <name>onos-floodlightpof</name>
     <version>1.0.0.onos-SNAPSHOT</version>
@@ -63,6 +63,20 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                </configuration>
+            </plugin>
+                <!-- include OSGi headers in MANIFEST -->
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>3.0.1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Import-Package>*;!org.codehaus.jackson,!org.codehaus.jackson.map</Import-Package>
+                        <Embed-Dependency> jackson-core-asl,jackson-mapper-asl </Embed-Dependency>
+                        <Embed-Transitive>ture</Embed-Transitive>
+                    </instructions>
                 </configuration>
             </plugin>
         </plugins>
