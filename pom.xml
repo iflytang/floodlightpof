@@ -6,12 +6,12 @@
         <version>7</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.github.USTC-INFINITELAB</groupId>
+    <groupId>com.github.ustc-infinitelab</groupId>
     <artifactId>floodlightpof</artifactId>
     <packaging>bundle</packaging>
     <url>https://github.com/USTC-INFINITELAB/floodlightpof</url>
     <name>onos-floodlightpof</name>
-    <version>1.0.1.onos</version>
+    <version>1.0.2-SNAPSHOT</version>
     <description>onos pof controller protocol</description>
     <licenses>
         <license>
@@ -24,7 +24,7 @@
         <connection> scm:git:https://github.com/USTC-INFINITELAB/floodlightpof.git</connection>
         <developerConnection> scm:git:https://github.com/USTC-INFINITELAB/floodlightpof.git</developerConnection>
         <url>https://github.com/USTC-INFINITELAB/floodlightpof.git</url>
-        <tag>floodlightpof-1.0.0</tag>
+        <tag>floodlightpof-1.0.2</tag>
     </scm>
     <distributionManagement>
         <!--<repository>-->
@@ -58,8 +58,9 @@
     <build>
         <plugins>
             <plugin>
-                <groupId> org.apache.maven.plugins </groupId>
-                <artifactId> maven-compiler-plugin </artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>

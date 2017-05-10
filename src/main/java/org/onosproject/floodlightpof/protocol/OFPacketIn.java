@@ -59,7 +59,8 @@ public class OFPacketIn extends OFMessage {
     protected long cookie;
 
     protected int deviceId;
-    protected int slotPortId;
+    protected short slotPortId;
+    protected short inPortId;
 
     protected byte[] packetData;
 
@@ -183,24 +184,24 @@ public class OFPacketIn extends OFMessage {
         return slotPortId;
     }
 
-    public void setSlotPortId(int slotPortId) {
+    public void setSlotPortId(short slotPortId) {
         this.slotPortId = slotPortId;
     }
 
     public short getSlotId() {
-        return (short) ((slotPortId & 0xffff0000) >> 16);
+        return slotPortId;
     }
 
     public void setSlotId(short slotId) {
-        this.slotPortId = (slotPortId & 0x0000ffff) & (((int) slotId) << 16);
+        this.slotPortId = slotId;
     }
 
     public short getPortId() {
-        return (short) ((slotPortId & 0x0000ffff) >> 16);
+        return inPortId;
     }
 
-    public void setPortId(short portId) {
-        this.slotPortId = (slotPortId & 0xffff0000) & portId;
+    public void setPortId(short inPortId) {
+        this.inPortId = inPortId;
     }
 
     @Override
@@ -214,7 +215,8 @@ public class OFPacketIn extends OFMessage {
         this.cookie = data.readLong();
 
         this.deviceId = data.readInt();
-        this.slotPortId = data.readInt();
+        this.slotPortId = data.readShort();
+        this.inPortId = data.readShort();
 
         this.packetData = new byte[totalLength];
         //this.packetData = new byte[OFGlobal.OFP_PACKET_IN_MAX_LENGTH];
@@ -233,7 +235,8 @@ public class OFPacketIn extends OFMessage {
         data.writeLong(cookie);
 
         data.writeInt(deviceId);
-        data.writeInt(slotPortId);
+        data.writeShort(slotPortId);
+        data.writeShort(inPortId);
 
         if (null != packetData) {
             if (packetData.length < OFGlobal.OFP_PACKET_IN_MAX_LENGTH) {
@@ -263,6 +266,7 @@ public class OFPacketIn extends OFMessage {
 
         string += HexString.toHex(deviceId);
         string += HexString.toHex(slotPortId);
+        string += HexString.toHex(inPortId);
 
         string += HexString.byteZeroEnd(4);
 
@@ -292,7 +296,8 @@ public class OFPacketIn extends OFMessage {
                 ";tid=" + tableId +
                 ";ck=" + cookie +
                 ";did=" + deviceId +
-                ";pid=" + HexString.toHex(slotPortId) +
+                ";sid=" + HexString.toHex(slotPortId) +
+                ";pid=" + HexString.toHex(inPortId) +
                 ";data=" + HexString.toHex(packetData);
     }
 
@@ -306,6 +311,7 @@ public class OFPacketIn extends OFMessage {
         result = prime * result + Arrays.hashCode(packetData);
         result = prime * result + ((reason == null) ? 0 : reason.hashCode());
         result = prime * result + slotPortId;
+        result = prime * result + inPortId;
         result = prime * result + tableId;
         result = prime * result + totalLength;
         return result;
@@ -339,6 +345,9 @@ public class OFPacketIn extends OFMessage {
             return false;
         }
         if (slotPortId != other.slotPortId) {
+            return false;
+        }
+        if(inPortId != other.inPortId) {
             return false;
         }
         if (tableId != other.tableId) {
