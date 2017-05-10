@@ -11,7 +11,7 @@
     <packaging>bundle</packaging>
     <url>https://github.com/USTC-INFINITELAB/floodlightpof</url>
     <name>onos-floodlightpof</name>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2.onos</version>
     <description>onos pof controller protocol</description>
     <licenses>
         <license>
