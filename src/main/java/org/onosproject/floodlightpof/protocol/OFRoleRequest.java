@@ -67,6 +67,9 @@ public class OFRoleRequest extends OFMessage {
     public void setOfControllerRole(OFControllerRole ofControllerRole) {
         this.ofControllerRole = ofControllerRole;
     }
+    public int getXid() {
+        return this.xid;
+    }
 
     @Override
     public void writeTo(ChannelBuffer data) {

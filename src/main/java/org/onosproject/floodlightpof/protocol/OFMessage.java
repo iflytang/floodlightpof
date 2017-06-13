@@ -53,6 +53,8 @@ public class OFMessage {
     public OFMessage() {
         storage = null;
         this.version = OFP_VERSION;
+        xid=autoXID;
+        autoXID++;
     }
 
     protected synchronized ConcurrentHashMap<String, Object> getMessageStore() {
@@ -173,8 +175,6 @@ public class OFMessage {
         data.writeByte(version);
         data.writeByte(type.getTypeValue());
         data.writeShort(length);
-        xid = autoXID;
-        autoXID++;
         data.writeInt(xid);
     }
 
@@ -199,10 +199,10 @@ public class OFMessage {
      */
     public String toString() {
         return "ofmsg" +
-            ":v=" + U8.f(this.getVersion()) +
-            ";t=" + this.getType() +
-            ";l=" + this.getLengthU() +
-            ";x=" + U32.f(this.getXid());
+            ":version=" + U8.f(this.getVersion()) +
+            ";type=" + this.getType() +
+            ";length=" + this.getLengthU() +
+            ";xid=" + U32.f(this.getXid());
     }
 
     @Override
