@@ -50,8 +50,9 @@ public class OFRoleRequest extends OFMessage {
     @Override
     public void readFrom(ChannelBuffer data) {
         super.readFrom(data);
-        ofControllerRole = OFControllerRole.values()[data.readByte()];
         data.readBytes(3);
+        ofControllerRole = OFControllerRole.values()[data.readByte()];
+
     }
 
     /**
@@ -75,9 +76,10 @@ public class OFRoleRequest extends OFMessage {
     public void writeTo(ChannelBuffer data) {
         super.writeTo(data);
         if (ofControllerRole != null) {
-            data.writeByte((byte) ofControllerRole.ordinal());
+            data.writeByte((byte)ofControllerRole.ordinal());
             data.writeZero(3);
         }
+
     }
     @Override
     public String toString() {

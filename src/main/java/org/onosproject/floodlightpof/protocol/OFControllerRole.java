@@ -14,6 +14,5 @@ public enum OFControllerRole {
     ROLE_MASTER,
     ROLE_SLAVE;
 
-    private OFControllerRole() {
-    }
+    private OFControllerRole() {}
 }
