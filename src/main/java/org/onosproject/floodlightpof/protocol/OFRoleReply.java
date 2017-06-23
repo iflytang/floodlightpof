@@ -64,10 +64,8 @@ public class OFRoleReply extends OFMessage {
     public void writeTo(ChannelBuffer data) {
         super.writeTo(data);
         if (ofControllerRole != null) {
-
             data.writeByte( (byte)ofControllerRole.ordinal());
             data.writeZero(3);
-
         }
     }
     @Override

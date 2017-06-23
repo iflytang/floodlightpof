@@ -78,6 +78,7 @@ public class OFRoleRequest extends OFMessage {
         if (ofControllerRole != null) {
             data.writeByte((byte)ofControllerRole.ordinal());
             data.writeZero(3);
+
         }
 
     }
