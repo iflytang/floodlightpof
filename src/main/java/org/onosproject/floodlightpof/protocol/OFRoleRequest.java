@@ -36,7 +36,7 @@ import java.util.logging.Logger;
  */
 public class OFRoleRequest extends OFMessage {
 
-    public static int minimumLength = 12;
+    public static int minimumLength = 9;
     protected OFControllerRole ofControllerRole;
 
     //TODO implement
@@ -50,7 +50,6 @@ public class OFRoleRequest extends OFMessage {
     @Override
     public void readFrom(ChannelBuffer data) {
         super.readFrom(data);
-        data.readBytes(3);
         ofControllerRole = OFControllerRole.values()[data.readByte()];
 
     }
@@ -77,8 +76,6 @@ public class OFRoleRequest extends OFMessage {
         super.writeTo(data);
         if (ofControllerRole != null) {
             data.writeByte((byte)ofControllerRole.ordinal());
-            data.writeZero(3);
-
         }
 
     }
