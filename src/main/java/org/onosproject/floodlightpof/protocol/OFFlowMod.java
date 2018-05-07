@@ -47,11 +47,11 @@ import org.onosproject.floodlightpof.util.U16;
  *
  */
 public class OFFlowMod extends OFMessage implements OFInstructionFactoryAware, Cloneable {
-    public static final int MINIMUM_LENGTH = OFMessage.MINIMUM_LENGTH + 40;  //48
+    public static final int MINIMUM_LENGTH = OFMessage.MINIMUM_LENGTH + 40;  // 48B
     public static final int MAXIMAL_LENGTH = OFMessage.MINIMUM_LENGTH
                                                 + 40
                                                 + OFMatchX.MINIMUM_LENGTH * OFGlobal.OFP_MAX_MATCH_FIELD_NUM
-                                                + OFInstruction.MAXIMAL_LENGTH * OFGlobal.OFP_MAX_INSTRUCTION_NUM;
+                                                + OFInstruction.MAXIMAL_LENGTH * OFGlobal.OFP_MAX_INSTRUCTION_NUM; // 2192B
 
     public enum OFFlowEntryCmd {
         OFPFC_ADD,                  /* New flow. */

@@ -49,6 +49,7 @@ import org.onosproject.floodlightpof.util.U16;
 @JsonSerialize(using = OFFeaturesReplyJsonSerializer.class)
 public class OFFeaturesReply extends OFMessage {
     public static int minimumLength = 16 + 3 * OFGlobal.OFP_NAME_MAX_LENGTH + OFMessage.MINIMUM_LENGTH;
+    //public static int minimumLength = 216;   // added by tsf
 
     /**
      * Corresponds to bits on the capabilities field.

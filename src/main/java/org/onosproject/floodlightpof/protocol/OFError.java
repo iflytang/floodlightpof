@@ -80,7 +80,8 @@ public class OFError extends OFMessage implements OFMessageFactoryAware {
     }
 
     public enum OFHelloFailedCode {
-        OFPHFC_INCOMPATIBLE, OFPHFC_EPERM
+        OFPHFC_INCOMPATIBLE,
+        OFPHFC_EPERM
     }
 
     public enum OFBadRequestCode {
@@ -205,11 +206,14 @@ public class OFError extends OFMessage implements OFMessageFactoryAware {
     }
 
     public enum OFPortModFailedCode {
-        OFPPMFC_BAD_PORT, OFPPMFC_BAD_HW_ADDR
+        OFPPMFC_BAD_PORT,
+        OFPPMFC_BAD_HW_ADDR
     }
 
     public enum OFQueueOpFailedCode {
-        OFPQOFC_BAD_PORT, OFPQOFC_BAD_QUEUE, OFPQOFC_EPERM
+        OFPQOFC_BAD_PORT,
+        OFPQOFC_BAD_QUEUE,
+        OFPQOFC_EPERM
     }
 
     public enum OFSoftwareErrorCode {
