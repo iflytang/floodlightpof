@@ -36,7 +36,7 @@ import java.util.logging.Logger;
  */
 public class OFRoleRequest extends OFMessage {
 
-    public static int minimumLength = 9;
+    public static int minimumLength = OFMessage.MINIMUM_LENGTH + 8;   // tsf: 64 bits alignment
     protected OFControllerRole ofControllerRole;
 
     //TODO implement
@@ -51,7 +51,7 @@ public class OFRoleRequest extends OFMessage {
     public void readFrom(ChannelBuffer data) {
         super.readFrom(data);
         ofControllerRole = OFControllerRole.values()[data.readByte()];
-
+        data.readBytes(7);
     }
 
     /**
@@ -77,7 +77,7 @@ public class OFRoleRequest extends OFMessage {
         if (ofControllerRole != null) {
             data.writeByte((byte)ofControllerRole.ordinal());
         }
-
+        data.writeZero(7);
     }
     @Override
     public String toString() {

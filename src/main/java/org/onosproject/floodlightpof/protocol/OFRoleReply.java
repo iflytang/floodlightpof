@@ -32,7 +32,7 @@ import org.onosproject.floodlightpof.util.U16;
  *
  */
 public class OFRoleReply extends OFMessage {
-    public static int minimumlength = 9;
+    public static int minimumlength = OFMessage.MINIMUM_LENGTH + 8;  // tsf: 64 bits alignment
     protected OFControllerRole ofControllerRole;
     //TODO implement
     public OFRoleReply() {
@@ -44,6 +44,7 @@ public class OFRoleReply extends OFMessage {
     public void readFrom(ChannelBuffer data) {
         super.readFrom(data);
         ofControllerRole = OFControllerRole.values()[data.readByte()];
+        data.readBytes(7);
     }
     /**
      * @return the ofControllerRole
@@ -65,6 +66,7 @@ public class OFRoleReply extends OFMessage {
         if (ofControllerRole != null) {
             data.writeByte( (byte)ofControllerRole.ordinal());
         }
+        data.writeZero(7);
     }
     @Override
     public String toString() {
