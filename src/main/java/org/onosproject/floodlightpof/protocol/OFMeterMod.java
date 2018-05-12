@@ -36,7 +36,8 @@ import org.onosproject.floodlightpof.util.U16;
  *
  */
 public class OFMeterMod extends OFMessage {
-    public static int minimumLength = 16;
+    // public static int minimumLength = 16;
+    public static int minimumLength = OFMessage.MINIMUM_LENGTH + 16;   // 24B
 
     public enum OFMeterModCmd {
         OFPMC_ADD,
@@ -44,8 +45,9 @@ public class OFMeterMod extends OFMessage {
         OFPMC_DELETE
     }
 
-    protected OFMeterModCmd command;
-    protected short rate;    //kbps
+    protected OFMeterModCmd command;    // 1B
+    protected short slotId; // tsf: POFSwitch-1.4.0.015
+    protected int rate;     //kbps
     protected int meterId;
 
     public OFMeterMod() {
@@ -59,8 +61,10 @@ public class OFMeterMod extends OFMessage {
         super.readFrom(data);
         command = OFMeterModCmd.values()[ data.readByte() ];
         data.readBytes(1);
-        rate = data.readShort();
+        slotId = data.readShort();
+        rate = data.readInt();
         meterId = data.readInt();
+        data.readBytes(4);
     }
 
     @Override
@@ -68,14 +72,17 @@ public class OFMeterMod extends OFMessage {
         super.writeTo(data);
         data.writeByte((byte) command.ordinal());
         data.writeZero(1);
-        data.writeShort(rate);
+        data.writeShort(slotId);
+        data.writeInt(rate);
         data.writeInt(meterId);
+        data.writeZero(4);
     }
 
     public String toBytesString() {
         return super.toBytesString() +
                 HexString.toHex((byte) command.ordinal()) +
                 HexString.byteZeroEnd(1) +
+                HexString.toHex(slotId) +
                 HexString.toHex(rate) +
                 HexString.toHex(meterId);
     }
@@ -84,6 +91,7 @@ public class OFMeterMod extends OFMessage {
         return super.toString() +
                 "; MeterMod:" +
                 "cmd=" + command +
+                ";slot_id=" + slotId +
                 ";rate=" + rate +
                 ";mid=" + meterId;
     }
@@ -96,7 +104,15 @@ public class OFMeterMod extends OFMessage {
         this.command = command;
     }
 
-    public short getRate() {
+    public short getSlotId() {
+        return slotId;
+    }
+
+    public void setSlotId(short slotId) {
+        this.slotId = slotId;
+    }
+
+    public int getRate() {
         return rate;
     }
 
@@ -117,6 +133,7 @@ public class OFMeterMod extends OFMessage {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + ((command == null) ? 0 : command.hashCode());
+        result = prime * result + slotId;
         result = prime * result + meterId;
         result = prime * result + rate;
         return result;
@@ -135,6 +152,9 @@ public class OFMeterMod extends OFMessage {
         }
         OFMeterMod other = (OFMeterMod) obj;
         if (command != other.command) {
+            return false;
+        }
+        if (slotId != other.slotId) {
             return false;
         }
         if (meterId != other.meterId) {

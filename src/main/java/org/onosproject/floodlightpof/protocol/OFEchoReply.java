@@ -17,6 +17,7 @@
 
 package org.onosproject.floodlightpof.protocol;
 
+import org.jboss.netty.buffer.ChannelBuffer;
 import org.onosproject.floodlightpof.util.U16;
 
 /**
@@ -25,7 +26,7 @@ import org.onosproject.floodlightpof.util.U16;
  */
 
 public class OFEchoReply extends OFEchoRequest {
-    public static int minimumLength = 8;
+    public static int minimumLength = 8; // 8B, readFrom and writeTo implemented by OFEchoRequest
 
     public OFEchoReply() {
         super();

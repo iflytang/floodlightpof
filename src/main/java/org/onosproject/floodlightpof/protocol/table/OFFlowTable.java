@@ -56,20 +56,20 @@ import org.onosproject.floodlightpof.util.ParseString;
  */
 
 public class OFFlowTable implements Cloneable {
-    public static final int MINIMUM_LENGTH = OFGlobal.OFP_NAME_MAX_LENGTH + 16;
+    public static final int MINIMUM_LENGTH = OFGlobal.OFP_NAME_MAX_LENGTH + 16; // 80B
     public static final int MAXIMAL_LENGTH = OFGlobal.OFP_NAME_MAX_LENGTH + 16  + OFGlobal
-            .OFP_MAX_MATCH_FIELD_NUM * OFMatch20.MINIMUM_LENGTH;
+            .OFP_MAX_MATCH_FIELD_NUM * OFMatch20.MINIMUM_LENGTH;  // 144B
 
-    protected OFTableModCmd command;
+    protected OFTableModCmd command;  // 1B
     protected byte tableId;
-    protected OFTableType tableType;
+    protected OFTableType tableType;  // 1B
     protected byte matchFieldNum;
     protected int tableSize;
 
     protected short keyLength;
 
-    protected String tableName;
-    protected List<OFMatch20> matchFieldList;
+    protected String tableName;       // 64B
+    protected List<OFMatch20> matchFieldList;  // 8 * 8 = 64B
 
     public OFFlowTable(String tableName, byte tableId) {
         super();

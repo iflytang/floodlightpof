@@ -25,7 +25,7 @@ import org.onosproject.floodlightpof.util.U16;
  *
  */
 public class OFFeaturesRequest extends OFMessage {
-    public static int minimumLength = 8;
+    public static int minimumLength = 8; // 8B
 
     public OFFeaturesRequest() {
         super();

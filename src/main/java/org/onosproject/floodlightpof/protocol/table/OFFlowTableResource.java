@@ -52,15 +52,15 @@ import org.onosproject.floodlightpof.util.HexString;
  *
  */
 public class OFFlowTableResource extends OFMessage {
-    public static int minimumLength = OFMessage.MINIMUM_LENGTH + 16;
+    public static int minimumLength = OFMessage.MINIMUM_LENGTH + 16;  // 24B
     public static int maximalLength = OFFlowTableResource.minimumLength + OFTableResource
-            .minimumLength * OFTableType.MAX_TABLE_TYPE;
+            .minimumLength * OFTableType.MAX_TABLE_TYPE;   // 88B
 
     public enum OFResourceReportType {
         OFRRT_FLOW_TABLE
     }
 
-    protected OFResourceReportType resourceType;
+    protected OFResourceReportType resourceType;  // 1B
 
     protected short slotid;
 

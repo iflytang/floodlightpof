@@ -41,9 +41,9 @@ import org.onosproject.floodlightpof.util.U16;
  *
  */
 public class OFGroupMod extends OFMessage implements OFActionFactoryAware, Cloneable {
-    public static final int MINIMUM_LENGTH = OFMessage.MINIMUM_LENGTH + 16;
+    public static final int MINIMUM_LENGTH = OFMessage.MINIMUM_LENGTH + 16;  // 24B
     public static final int MAXIMAL_LENGTH = OFMessage.MINIMUM_LENGTH + 16 + OFGlobal
-            .OFP_MAX_ACTION_NUMBER_PER_GROUP * OFAction.MAXIMAL_LENGTH;
+            .OFP_MAX_ACTION_NUMBER_PER_GROUP * OFAction.MAXIMAL_LENGTH;   // 312B
 
     public enum OFGroupModCmd {
         OFPGC_ADD,
@@ -103,7 +103,8 @@ public class OFGroupMod extends OFMessage implements OFActionFactoryAware, Clone
         data.writeByte(command);
         data.writeByte(groupType);
         data.writeByte(actionNum);
-        data.writeByte(0);
+        // data.writeByte(0);
+        data.writeByte(1);  // tsf: alignment
         data.writeInt(groupId);
 
         data.writeInt(counterId);

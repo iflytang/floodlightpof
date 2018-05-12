@@ -24,7 +24,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
  * Base class representing ofp_switch_config based messages.
  */
 public abstract class OFSwitchConfig extends OFMessage {
-    public static int minimumLength = 16;
+    public static int minimumLength = 16;  // 16B
 
     public enum OFConfigFlags {
         OFPC_FRAG_NORMAL,
@@ -35,7 +35,7 @@ public abstract class OFSwitchConfig extends OFMessage {
 
     protected int deviceid;
     protected short flags;
-    protected short missSendLength;
+    protected short missSendLength;  // OFP_DEFAULT_MISS_SEND_LEN = 128B
 
     public OFSwitchConfig() {
         super();

@@ -75,7 +75,7 @@ public class OFFlowMod extends OFMessage implements OFInstructionFactoryAware, C
     protected long cookieMask;
 
     protected byte tableId;
-    protected OFTableType tableType;
+    protected OFTableType tableType;     // 1B
     protected short idleTimeout;
     protected short hardTimeout;
     protected short priority;

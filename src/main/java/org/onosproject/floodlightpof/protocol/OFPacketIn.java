@@ -42,8 +42,8 @@ import org.onosproject.floodlightpof.util.U8;
  */
 public class OFPacketIn extends OFMessage {
     public static short minimumLength = (short) (OFMessage.MINIMUM_LENGTH + 24); //32
-    public static short maximalLength = (short) (OFPacketIn.minimumLength + OFGlobal
-            .OFP_PACKET_IN_MAX_LENGTH); //2080;
+    public static short maximalLength = (short) (OFPacketIn.minimumLength +
+                                                 OFGlobal.OFP_PACKET_IN_MAX_LENGTH); // 32 + 2048 = 2080
 
     public enum OFPacketInReason {
         OFPR_NO_MATCH,
@@ -53,7 +53,7 @@ public class OFPacketIn extends OFMessage {
 
     protected int bufferId;
     protected short totalLength;
-    protected OFPacketInReason reason;
+    protected OFPacketInReason reason;  // 1B
     protected byte tableId;
 
     protected long cookie;
@@ -62,7 +62,7 @@ public class OFPacketIn extends OFMessage {
     protected short slotPortId;
     protected short inPortId;
 
-    protected byte[] packetData;
+    protected byte[] packetData; // byte[2048]
 
     public OFPacketIn() {
         super();
@@ -209,7 +209,7 @@ public class OFPacketIn extends OFMessage {
         super.readFrom(data);
         this.bufferId = data.readInt();
         this.totalLength = data.readShort();
-        this.reason = OFPacketInReason.values()[U8.f(data.readByte())];
+        this.reason = OFPacketInReason.values()[U8.f(data.readByte())];  // byte
         this.tableId = data.readByte();
 
         this.cookie = data.readLong();

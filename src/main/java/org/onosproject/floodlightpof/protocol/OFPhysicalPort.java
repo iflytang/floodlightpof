@@ -52,7 +52,8 @@ import org.onosproject.floodlightpof.util.ParseString;
  */
 @JsonSerialize(using = OFPhysicalPortJsonSerializer.class)
 public class OFPhysicalPort {
-    public static int minimumLength = 88;
+//    public static int minimumLength = 88;
+    public static int minimumLength = 120;   // tsf: sizeof(struct pof_port) == 120
     public static int ofpEthAlen = 6;
 
     public enum OFPortConfig {
@@ -265,7 +266,7 @@ public class OFPhysicalPort {
 
     protected byte[] hardwareAddress;
 
-    protected String name;              //32B
+    protected String name;              //32B? tsf: in pof stack, it's 64B
 
     protected int config;
     protected int state;

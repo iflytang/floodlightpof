@@ -34,7 +34,7 @@ import org.onosproject.floodlightpof.util.HexString;
  *
  */
 public class OFCounter {
-    public static int minimumLength = 24;
+    public static int minimumLength = 24; // 24B
 
     public enum OFCounterModCmd {
         OFPCC_ADD,

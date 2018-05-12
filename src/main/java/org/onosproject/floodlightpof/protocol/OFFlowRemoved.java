@@ -26,7 +26,7 @@ import org.onosproject.floodlightpof.util.U16;
  *
  */
 public class OFFlowRemoved extends OFMessage {
-    public static int minimumLength = 88;
+    public static int minimumLength = 88;  // 88B
 
     public enum OFFlowRemovedReason {
         OFPRR_IDLE_TIMEOUT,
@@ -37,7 +37,7 @@ public class OFFlowRemoved extends OFMessage {
     protected OFMatch match;
     protected long cookie;
     protected short priority;
-    protected OFFlowRemovedReason reason;
+    protected OFFlowRemovedReason reason;  // 1B
     protected int durationSeconds;
     protected int durationNanoseconds;
     protected short idleTimeout;

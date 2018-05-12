@@ -27,7 +27,7 @@ import org.onosproject.floodlightpof.util.U16;
  */
 
 public class OFEchoRequest extends OFMessage {
-    public static int minimumLength = 8;
+    public static int minimumLength = 8;   // 8B
     byte[] payload;
 
     public OFEchoRequest() {

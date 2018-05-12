@@ -23,6 +23,6 @@ package org.onosproject.floodlightpof.protocol;
 public class OFSetConfig extends OFSwitchConfig {
     public OFSetConfig() {
         super();
-        this.type = OFType.SET_CONFIG;
+        this.type = OFType.SET_CONFIG;  // 16B, readFrom and writeTo implemented by OFSwitchConfig
     }
 }

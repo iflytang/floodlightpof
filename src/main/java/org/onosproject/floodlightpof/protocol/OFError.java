@@ -34,8 +34,8 @@ import org.onosproject.floodlightpof.util.U16;
  *
  */
 public class OFError extends OFMessage implements OFMessageFactoryAware {
-    public static int minimumLength = OFMessage.MINIMUM_LENGTH + 16;
-    public static int maximalLength = OFMessage.MINIMUM_LENGTH + 16 + OFGlobal.OFP_ERROR_STRING_MAX_LENGTH;
+    public static int minimumLength = OFMessage.MINIMUM_LENGTH + 16;  // 24B
+    public static int maximalLength = OFMessage.MINIMUM_LENGTH + 16 + OFGlobal.OFP_ERROR_STRING_MAX_LENGTH;  // 280B
 
     public enum OFErrorType {
         // OFPET_VENDOR_ERROR is an extension that was added in Open vSwitch and isn't
@@ -537,7 +537,7 @@ public class OFError extends OFMessage implements OFMessageFactoryAware {
         data.readBytes(6);
 
         error = new byte[OFGlobal.OFP_ERROR_STRING_MAX_LENGTH];
-        data.readBytes(error);
+        data.readBytes(error);  // 256B
     }
 
     @Override

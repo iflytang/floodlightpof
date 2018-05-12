@@ -23,6 +23,6 @@ package org.onosproject.floodlightpof.protocol;
 public class OFGetConfigReply extends OFSwitchConfig {
     public OFGetConfigReply() {
         super();
-        this.type = OFType.GET_CONFIG_REPLY;
+        this.type = OFType.GET_CONFIG_REPLY;  // 16B
     }
 }

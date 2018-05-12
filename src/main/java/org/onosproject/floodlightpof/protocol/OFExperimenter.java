@@ -27,7 +27,7 @@ import org.onosproject.floodlightpof.protocol.factory.OFExperimenterDataFactoryA
  * Represents ofp_vendor_header.
  */
 public class OFExperimenter extends OFMessage implements OFExperimenterDataFactoryAware {
-    public static int minimumLength = 12;
+    public static int minimumLength = 12;  // 12B
 
     protected int experimenter;
     protected OFExperimenterData experimenterData;

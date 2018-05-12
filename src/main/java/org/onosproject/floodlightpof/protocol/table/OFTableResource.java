@@ -56,7 +56,7 @@ public class OFTableResource {
 
     public void readFrom(ChannelBuffer data) {
         this.deviceId   = data.readInt();
-        this.tableType  = OFTableType.values()[data.readByte()];
+        this.tableType  = OFTableType.values()[data.readByte()]; // 1B
         this.tableNum   = data.readByte();
         this.keyLength  = data.readShort();
 

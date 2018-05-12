@@ -48,7 +48,7 @@ import org.onosproject.floodlightpof.util.U16;
  */
 @JsonSerialize(using = OFFeaturesReplyJsonSerializer.class)
 public class OFFeaturesReply extends OFMessage {
-    public static int minimumLength = 16 + 3 * OFGlobal.OFP_NAME_MAX_LENGTH + OFMessage.MINIMUM_LENGTH;
+    public static int minimumLength = 16 + 3 * OFGlobal.OFP_NAME_MAX_LENGTH + OFMessage.MINIMUM_LENGTH; // 216B
     //public static int minimumLength = 216;   // added by tsf
 
     /**
@@ -85,11 +85,11 @@ public class OFFeaturesReply extends OFMessage {
 
     protected short tableNum;
 
-    protected int       capabilities;
+    protected int capabilities;
 
-    protected String    experimenterName;           //32B
-    protected String    deviceForwardEngineName;
-    protected String    deviceLookupEngineName;
+    protected String    experimenterName;           //32B?? tsf: 64B
+    protected String    deviceForwardEngineName;    // 64B
+    protected String    deviceLookupEngineName;     // 64B
 
     public OFFeaturesReply() {
         super();

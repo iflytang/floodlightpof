@@ -41,7 +41,7 @@ import org.onosproject.floodlightpof.util.U16;
  *
  */
 public class OFTableMod extends OFMessage implements Cloneable {
-    public static final int MINIMUM_LENGTH = OFMessage.MINIMUM_LENGTH + OFFlowTable.MAXIMAL_LENGTH;
+    public static final int MINIMUM_LENGTH = OFMessage.MINIMUM_LENGTH + OFFlowTable.MAXIMAL_LENGTH; // 152B
 
     protected OFFlowTable flowTable;
 

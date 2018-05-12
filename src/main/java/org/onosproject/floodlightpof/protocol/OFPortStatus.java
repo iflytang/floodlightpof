@@ -26,7 +26,7 @@ import org.onosproject.floodlightpof.util.U16;
  * Represents an ofp_port_status message.
  */
 public class OFPortStatus extends OFMessage {
-    public static int minimumLength = OFMessage.MINIMUM_LENGTH + 8 + OFPhysicalPort.minimumLength;
+    public static int minimumLength = OFMessage.MINIMUM_LENGTH + 8 + OFPhysicalPort.minimumLength; // 136B
 
     public enum OFPortReason {
         OFPPR_ADD,

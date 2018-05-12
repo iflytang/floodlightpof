@@ -33,7 +33,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
  *
  */
 public class OFCounterRequest extends OFMessage {
-    public static int minimumLength = OFMessage.MINIMUM_LENGTH + OFCounter.minimumLength;
+    public static int minimumLength = OFMessage.MINIMUM_LENGTH + OFCounter.minimumLength;  // 32B
 
     protected OFCounter counter;
 

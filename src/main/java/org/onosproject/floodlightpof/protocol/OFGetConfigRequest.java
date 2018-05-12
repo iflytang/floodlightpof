@@ -26,6 +26,6 @@ public class OFGetConfigRequest extends OFMessage {
     public OFGetConfigRequest() {
         super();
         this.type = OFType.GET_CONFIG_REQUEST;
-        this.length = U16.t(OFMessage.MINIMUM_LENGTH);
+        this.length = U16.t(OFMessage.MINIMUM_LENGTH);  // 8B
     }
 }
