@@ -31,13 +31,14 @@ import org.onosproject.floodlightpof.util.U16;
  *
  */
 public class OFPacketOut extends OFMessage implements OFActionFactoryAware {
-    public static int minimumLength = 16;
+    public static int minimumLength = 16;    // 16B
+    public static int maximumLength = 2360;  // 2360B
     public static int bufferIdNone = 0xffffffff;
 
     protected OFActionFactory actionFactory;
     protected int bufferId;
     protected int inPort;
-    protected short actionsLength;
+    protected byte actionsLength;  /* tsf: actionNum */
     protected List<OFAction> actions;
     protected byte[] packetData;
     private static final int OFPMAXACTION_PERINSTRUCTION = 6;
@@ -46,7 +47,8 @@ public class OFPacketOut extends OFMessage implements OFActionFactoryAware {
     public OFPacketOut() {
         super();
         this.type = OFType.PACKET_OUT;
-        this.length = U16.t(minimumLength);
+        // this.length = U16.t(minimumLength);
+        this.length = U16.t(maximumLength);
     }
 
     /**
@@ -113,7 +115,7 @@ public class OFPacketOut extends OFMessage implements OFActionFactoryAware {
      * Get actions_len.
      * @return actionsLength
      */
-    public short getActionsLength() {
+    public byte getActionsLength() {
         return this.actionsLength;
     }
 
@@ -130,7 +132,7 @@ public class OFPacketOut extends OFMessage implements OFActionFactoryAware {
      * @param actionsLenGth
      */
     public OFPacketOut setActionsLength(short actionsLenGth) {
-        this.actionsLength = actionsLenGth;
+        this.actionsLength = (byte) actionsLenGth;
         return this;
     }
 
@@ -156,12 +158,13 @@ public class OFPacketOut extends OFMessage implements OFActionFactoryAware {
         this.actionFactory = actionFactory;
     }
 
+    /* tsf: Controller will not process PacketOut message. */
     @Override
     public void readFrom(ChannelBuffer data) {
         super.readFrom(data);
         this.bufferId = data.readInt();
         this.inPort = data.readShort();
-        this.actionsLength = data.readShort();
+        this.actionsLength = data.readByte();
         if (this.actionFactory == null) {
             throw new RuntimeException("ActionFactory not set");
         }
@@ -176,27 +179,34 @@ public class OFPacketOut extends OFMessage implements OFActionFactoryAware {
         data.writeInt(this.bufferId);
         data.writeInt(this.inPort);
         data.writeByte(this.actionsLength);
-        data.writeBytes(PADDING, 0, 3);
+        // data.writeBytes(PADDING, 0, 3);
+        data.writeZero(3);
         data.writeInt(this.packetData.length);
-        for (OFAction action : actions) {
-            action.writeTo(data);
-            if (action.getLength() < 48) {
-                data.writeBytes(PADDING, 0, 48 - action.getLength());
+        if (this.actionsLength == 0) {
+            data.writeZero(OFGlobal.OFP_MAX_ACTION_NUMBER_PER_INSTRUCTION * OFAction.MAXIMAL_LENGTH);  // 6 * 48
+        } else {
+            for (OFAction action : actions) {
+                action.writeTo(data);
+                if (action.getLength() < OFAction.MAXIMAL_LENGTH) {
+                    data.writeZero(OFAction.MAXIMAL_LENGTH - action.getLength());
+                }
             }
-        }
-        for (int i = 0; i < OFPMAXACTION_PERINSTRUCTION - this.actions.size(); i++) {
-            data.writeBytes(PADDING, 0, 48);
-        }
+            if (this.actions.size() < OFGlobal.OFP_MAX_ACTION_NUMBER_PER_INSTRUCTION) {
+                data.writeZero((OFGlobal.OFP_MAX_ACTION_NUMBER_PER_INSTRUCTION - this.actions.size()) *
+                                OFAction.MAXIMAL_LENGTH);
+            }
 
-        if (this.packetData != null) {
-            data.writeBytes(this.packetData);
-        }
-        int blank = OFPPACKETIN_MAXLENGTH - this.packetData.length;
-        for (int i = 0; i < blank; i += 128) {
-            if (blank - i >= 128) {
-                data.writeBytes(PADDING, 0, 128);
+            if (this.packetData != null) {
+                if (this.packetData.length < OFGlobal.OFP_PACKET_IN_MAX_LENGTH) {  /* check length */
+                    data.writeBytes(this.packetData);
+                }
+            }
+            int blank = OFGlobal.OFP_PACKET_IN_MAX_LENGTH - this.packetData.length;
+            if (blank > 1024) {
+                data.writeZero(1024);
+                data.writeZero(blank - 1024);
             } else {
-                data.writeBytes(PADDING, 0, blank - i);
+                data.writeZero(blank);
             }
         }
 
