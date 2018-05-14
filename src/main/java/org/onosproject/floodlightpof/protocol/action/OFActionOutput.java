@@ -32,15 +32,16 @@ import org.onosproject.floodlightpof.util.HexString;
  */
 
 public class OFActionOutput extends OFAction {
-    public static final int MINIMUM_LENGTH = OFAction.MINIMUM_LENGTH + 8 + OFMatch20.MINIMUM_LENGTH;
+    // public static final int MINIMUM_LENGTH = OFAction.MINIMUM_LENGTH + 8 + OFMatch20.MINIMUM_LENGTH;
+    public static final int MINIMUM_LENGTH = 24;   // tsf: pad 4 zero bytes to support ovs
 
-    protected byte pordIdValueType;
+    protected byte pordIdValueType;     // 0: immediate value; 1: packet/metadata field
     protected short metadataOffset;     //bit
     protected short metadataLength;     //bit
     protected short packetOffset;       //byte
 
-    protected int portId;
-    protected OFMatch20 portIdField;
+    protected int portId;               // type: 0
+    protected OFMatch20 portIdField;    // type: 1
 
     public OFActionOutput() {
         super.setType(OFActionType.OUTPUT);
@@ -170,6 +171,7 @@ public class OFActionOutput extends OFAction {
             portIdField = null;
             data.readBytes(OFMatch20.MINIMUM_LENGTH);
         }
+        data.readBytes(4);     // tsf: read more 4 zeros in ovs
     }
 
     @Override
@@ -190,6 +192,7 @@ public class OFActionOutput extends OFAction {
         } else {
             data.writeZero(OFMatch20.MINIMUM_LENGTH);
         }
+        data.writeZero(4);    // tsf: pad more 4 zeros
     }
 
     public String toBytesString() {
@@ -208,6 +211,7 @@ public class OFActionOutput extends OFAction {
         } else {
             byteString += HexString.byteZeroEnd(OFMatch20.MINIMUM_LENGTH);
         }
+        byteString += HexString.byteZeroEnd(4);  // tsf: add 4 zeros parse
 
         return byteString;
     }
