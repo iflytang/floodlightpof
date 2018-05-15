@@ -37,7 +37,8 @@ import org.onosproject.floodlightpof.util.HexString;
  *
  */
 public class OFActionAddField extends OFAction {
-    public static final int MINIMUM_LENGTH = OFAction.MINIMUM_LENGTH + 8 + OFGlobal.OFP_MAX_FIELD_LENGTH_IN_BYTE;
+    // public static final int MINIMUM_LENGTH = OFAction.MINIMUM_LENGTH + 8 + OFGlobal.OFP_MAX_FIELD_LENGTH_IN_BYTE;
+    public static final int MINIMUM_LENGTH = 32;  // tsf: pad 4 more zeros
 
     protected short fieldId;
     protected short fieldPosition;  //bit
@@ -59,6 +60,7 @@ public class OFActionAddField extends OFAction {
 
         fieldValue = new byte[OFGlobal.OFP_MAX_FIELD_LENGTH_IN_BYTE];
         data.readBytes(fieldValue);
+        data.readBytes(4);    // tsf: read 4 more zeros for ovs
     }
 
     public void writeTo(ChannelBuffer data) {
@@ -79,6 +81,7 @@ public class OFActionAddField extends OFAction {
                 data.writeZero(OFGlobal.OFP_MAX_FIELD_LENGTH_IN_BYTE - fieldValue.length);
             }
         }
+        data.writeZero(4);   // tsf: write 4 more zeros
     }
 
     public String toBytesString() {
@@ -100,6 +103,7 @@ public class OFActionAddField extends OFAction {
                 string += HexString.byteZeroEnd(OFGlobal.OFP_MAX_FIELD_LENGTH_IN_BYTE - fieldValue.length);
             }
         }
+        string += HexString.byteZeroEnd(4);  // tsf: parse 4 more zeros
 
         return string;
     }
