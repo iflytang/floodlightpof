@@ -35,7 +35,8 @@ import org.onosproject.floodlightpof.util.HexString;
  *
  */
 public class OFActionModifyField extends OFAction {
-    public static final int MINIMUM_LENGTH = OFAction.MINIMUM_LENGTH + OFMatch20.MINIMUM_LENGTH + 8;
+    // public static final int MINIMUM_LENGTH = OFAction.MINIMUM_LENGTH + OFMatch20.MINIMUM_LENGTH + 8;
+    public static final int MINIMUM_LENGTH = OFAction.MINIMUM_LENGTH + OFMatch20.MINIMUM_LENGTH + 4;  // tsf: pad less 4 zeros
 
     protected OFMatch20 matchField;
     protected int increment;
@@ -50,21 +51,21 @@ public class OFActionModifyField extends OFAction {
         matchField = new OFMatch20();
         matchField.readFrom(data);
         this.increment = data.readInt();
-        data.readBytes(4);
+        // data.readBytes(4);    // tsf: read less 4 zeros for ovs
     }
 
     public void writeTo(ChannelBuffer data) {
         super.writeTo(data);
         matchField.writeTo(data);
         data.writeInt(increment);
-        data.writeZero(4);
+        // data.writeZero(4);   // tsf: write less 4 zeros for ovs
     }
 
     public String toBytesString() {
         return super.toBytesString() +
                 matchField.toBytesString() +
-                HexString.toHex(increment) +
-                HexString.byteZeroEnd(4);
+                HexString.toHex(increment) ;
+                // + HexString.byteZeroEnd(4);   // tsf: no 4 zeros
     }
 
     public String toString() {
