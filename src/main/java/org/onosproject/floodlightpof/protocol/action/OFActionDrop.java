@@ -34,7 +34,8 @@ import org.onosproject.floodlightpof.util.HexString;
  *
  */
 public class OFActionDrop extends OFAction {
-    public static final int MINIMUM_LENGTH = OFAction.MINIMUM_LENGTH + 8;
+    // public static final int MINIMUM_LENGTH = OFAction.MINIMUM_LENGTH + 8;
+    public static final int MINIMUM_LENGTH = OFAction.MINIMUM_LENGTH + 12;  // tsf: pad 4 more zeros
 
     public enum OFDropReason {
         OFPDT_TIMEOUT,
@@ -52,19 +53,19 @@ public class OFActionDrop extends OFAction {
     public void readFrom(ChannelBuffer data) {
         super.readFrom(data);
         this.reason = data.readInt();
-        data.readBytes(4);
+        data.readBytes(8);     // tsf: read 4 more zeros for ovs
     }
 
     public void writeTo(ChannelBuffer data) {
         super.writeTo(data);
         data.writeInt(reason);
-        data.writeZero(4);
+        data.writeZero(8);   // tsf: write 4 more zeros for ovs
     }
 
     public String toBytesString() {
         return super.toBytesString() +
                 HexString.toHex(reason) +
-                HexString.byteZeroEnd(4);
+                HexString.byteZeroEnd(8);  // tsf: change 4 to 8
     }
 
     public String toString() {
