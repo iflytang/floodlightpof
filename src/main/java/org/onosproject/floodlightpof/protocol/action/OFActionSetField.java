@@ -27,13 +27,15 @@ package org.onosproject.floodlightpof.protocol.action;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.onosproject.floodlightpof.protocol.OFMatchX;
+import org.onosproject.floodlightpof.util.HexString;
 
 /**
  * Set field value using {@link #fieldSetting} (value/mask).
  *
  */
 public class OFActionSetField extends OFAction {
-    public static final int MINIMUM_LENGTH = OFAction.MINIMUM_LENGTH + OFMatchX.MINIMUM_LENGTH;
+    // public static final int MINIMUM_LENGTH = OFAction.MINIMUM_LENGTH + OFMatchX.MINIMUM_LENGTH;
+    public static final int MINIMUM_LENGTH = OFAction.MINIMUM_LENGTH + OFMatchX.MINIMUM_LENGTH + 4;   // tsf: pad more 4 zeros
     protected OFMatchX fieldSetting;
 
     public OFActionSetField() {
@@ -45,16 +47,19 @@ public class OFActionSetField extends OFAction {
         super.readFrom(data);
         fieldSetting = new OFMatchX();
         fieldSetting.readFrom(data);
+        data.readBytes(4);     // tsf: read 4 more zeros for ovs
     }
 
     public void writeTo(ChannelBuffer data) {
         super.writeTo(data);
         fieldSetting.writeTo(data);
+        data.writeZero(4);   // tsf: write 4 more zeros for ovs
     }
 
     public String toBytesString() {
         return super.toBytesString() +
-                fieldSetting.toBytesString();
+                fieldSetting.toBytesString() +
+                HexString.byteZeroEnd(4);   // tsf: add 4 zeros
     }
 
     public String toString() {
