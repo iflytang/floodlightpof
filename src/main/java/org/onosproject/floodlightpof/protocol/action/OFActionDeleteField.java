@@ -35,7 +35,8 @@ import org.onosproject.floodlightpof.util.HexString;
  *
  */
 public class OFActionDeleteField extends OFAction {
-    public static final int MINIMUM_LENGTH = OFAction.MINIMUM_LENGTH + 8 + OFMatch20.MINIMUM_LENGTH;
+    // public static final int MINIMUM_LENGTH = OFAction.MINIMUM_LENGTH + 8 + OFMatch20.MINIMUM_LENGTH;
+    public static final int MINIMUM_LENGTH = 24;   // tsf: pad 4 more zeros
 
     protected short tagPosition;    //bit
     protected byte tagLengthValueType;
@@ -68,6 +69,7 @@ public class OFActionDeleteField extends OFAction {
             tagLengthField = null;
             data.readBytes(OFMatch20.MINIMUM_LENGTH);
         }
+        data.readBytes(4);    // tsf: read 4 more zeros for ovs
     }
 
     public void writeTo(ChannelBuffer data) {
@@ -85,6 +87,7 @@ public class OFActionDeleteField extends OFAction {
         } else {
             data.writeZero(OFMatch20.MINIMUM_LENGTH);
         }
+        data.writeZero(4);  // tsf: pad 4 more zeros for ovs
     }
 
     public String toBytesString() {
@@ -100,6 +103,7 @@ public class OFActionDeleteField extends OFAction {
         } else {
             byteString += HexString.byteZeroEnd(OFMatch20.MINIMUM_LENGTH);
         }
+        byteString += HexString.byteZeroEnd(4);  // tsf: parse 4 more zeros
 
         return byteString;
     }
