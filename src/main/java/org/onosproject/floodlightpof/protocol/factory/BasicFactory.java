@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.onosproject.floodlightpof.protocol.OFBucket;
 import org.onosproject.floodlightpof.protocol.OFMessage;
 import org.onosproject.floodlightpof.protocol.OFType;
 import org.onosproject.floodlightpof.protocol.action.OFAction;
@@ -43,7 +44,7 @@ import org.onosproject.floodlightpof.protocol.statistics.OFVendorStatistics;
  */
 public class BasicFactory implements OFMessageFactory, OFActionFactory, OFInstructionFactory,
                                         OFStatisticsFactory, OFExperimenterDataFactory,
-                                        SMMessageFactory {
+                                        SMMessageFactory, OFBucketFactory {
     @Override
     public OFMessage getOFMessage(OFType t) {
         return t.newInstance();
@@ -334,6 +335,53 @@ public class BasicFactory implements OFMessageFactory, OFActionFactory, OFInstru
                                     OFInstruction.MINIMUM_LENGTH));
             }
             results.add(ofi);
+        }
+
+        return results;
+    }
+
+    /**
+     * @tsf implement OFBuckcetFactory interface here
+     */
+
+    @Override
+    public OFBucket getBucket() {
+        return new OFBucket();
+    }
+
+    @Override
+    public List<OFBucket> parseBuckets(ChannelBuffer data, int length) {
+        return parseBuckets(data, length, 0);
+    }
+
+    @Override
+    public List<OFBucket> parseBuckets(ChannelBuffer data, int length, int limit) {
+        List<OFBucket> results = new ArrayList<>();
+        OFBucket demux = new OFBucket();
+        OFBucket ofb;
+        int end = data.readerIndex() + length;
+
+        while (limit == 0 || results.size() <= limit) {
+            if (data.readableBytes() < OFBucket.MINIMUM_LENGTH ||
+                (data.readerIndex() + OFBucket.MINIMUM_LENGTH) > end) {
+                return results;
+            }
+
+            data.markReaderIndex();
+            demux.readFrom(data);
+            data.resetReaderIndex();
+
+            if ((demux.getLengthU() > data.readableBytes() ||
+               (data.readerIndex() + demux.getLengthU()) > end)) {
+                return results;
+            }
+
+            ofb = getBucket();  // @tsf: bucket is same, no type
+            ofb.readFrom(data); // @tsf: here read whole bucket; while parseAction just read action header, so need next codes
+            /*if (OFBucket.class.equals(ofb.getClass())) {
+                data.readerIndex(data.readerIndex() + (ofb.getLengthU() - OFBucket.MINIMUM_LENGTH));
+            }*/
+            results.add(ofb);
         }
 
         return results;

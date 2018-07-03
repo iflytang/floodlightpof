@@ -32,18 +32,22 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.onosproject.floodlightpof.protocol.action.OFAction;
 import org.onosproject.floodlightpof.protocol.factory.OFActionFactory;
 import org.onosproject.floodlightpof.protocol.factory.OFActionFactoryAware;
+import org.onosproject.floodlightpof.protocol.factory.OFBucketFactory;
+import org.onosproject.floodlightpof.protocol.factory.OFBucketFactoryAware;
 import org.onosproject.floodlightpof.util.HexString;
 import org.onosproject.floodlightpof.util.U16;
 
 /**
  * Represents an ofp_group_mod message.
  *
- *
+ * @desp modified by tsf. Implement all four kinds of ofp_group_mod message, i.e.
+ *       all, indirect, select, fast failover. And make every ofp_group_mod contains
+ *       up to six buckets. If buckets num less than six, then pad zeros.
  */
-public class OFGroupMod extends OFMessage implements OFActionFactoryAware, Cloneable {
+public class OFGroupMod extends OFMessage implements OFBucketFactoryAware, Cloneable {
     public static final int MINIMUM_LENGTH = OFMessage.MINIMUM_LENGTH + 16;  // 24B
-    public static final int MAXIMAL_LENGTH = OFMessage.MINIMUM_LENGTH + 16 + OFGlobal
-            .OFP_MAX_ACTION_NUMBER_PER_GROUP * OFAction.MAXIMAL_LENGTH;   // 312B
+    public static final int MAXIMAL_LENGTH = MINIMUM_LENGTH + OFGlobal.OFP_MAX_ACTION_NUMBER_PER_BUCKET
+                                            * OFBucket.MAXIMAL_LENGTH;  // 24 + 6*304 = 1848 bytes
 
     public enum OFGroupModCmd {
         OFPGC_ADD,
@@ -60,14 +64,17 @@ public class OFGroupMod extends OFMessage implements OFActionFactoryAware, Clone
 
     protected byte command;
     protected byte groupType;
-    protected byte actionNum;
+    protected byte bucketNum;
+    // padding 1 bytes
     protected int groupId;
 
     protected int counterId;
+    protected short slotId;
+    // padding 2 bytes
 
-    protected List<OFAction> actionList;
+    protected List<OFBucket> bucketList;  // the size is up to six
 
-    protected OFActionFactory actionFactory;
+    protected OFBucketFactory bucketFactory;
 
     public OFGroupMod() {
         super();
@@ -86,15 +93,17 @@ public class OFGroupMod extends OFMessage implements OFActionFactoryAware, Clone
 
         command = data.readByte();
         groupType = data.readByte();
-        actionNum = data.readByte();
+        bucketNum = data.readByte();
         data.readByte();
         groupId = data.readInt();
 
         counterId = data.readInt();
-        data.readBytes(4);
+        slotId = data.readShort();
+        data.readBytes(2);
 
-        this.actionList = this.actionFactory.parseActions(data, OFGlobal
-                .OFP_MAX_ACTION_NUMBER_PER_GROUP * OFAction.MAXIMAL_LENGTH);
+        // read bucket_list, need to implement a OFBucketFactory? in fact, there is no reading for controller
+        this.bucketList = this.bucketFactory.parseBuckets(data, OFGlobal.
+                              OFP_MAX_BUCKET_NUMBER_PER_GROUP * OFBucket.MAXIMAL_LENGTH);
     }
 
     @Override
@@ -102,37 +111,38 @@ public class OFGroupMod extends OFMessage implements OFActionFactoryAware, Clone
         super.writeTo(data);
         data.writeByte(command);
         data.writeByte(groupType);
-        data.writeByte(actionNum);
-        // data.writeByte(0);
-        data.writeByte(1);  // tsf: alignment
+        data.writeByte(bucketNum);
+        data.writeZero(1);
         data.writeInt(groupId);
 
         data.writeInt(counterId);
-        data.writeZero(4);
+        data.writeShort(slotId);
+        data.writeZero(2);
 
-        if (actionList == null) {
-            data.writeZero(OFGlobal.OFP_MAX_ACTION_NUMBER_PER_GROUP * OFAction.MAXIMAL_LENGTH);
+        if (bucketList == null) {
+            data.writeZero(OFGlobal.OFP_MAX_BUCKET_NUMBER_PER_GROUP * OFBucket.MAXIMAL_LENGTH);
         } else {
-            OFAction action;
+            OFBucket bucket;
 
-            if (actionNum > actionList.size()) {
-                throw new RuntimeException("actionNum " + actionNum + " > actionList.size()" + actionList.size());
+            if (bucketNum > bucketList.size()) {
+                throw new RuntimeException("bucketNum " + bucketNum + " > bucketList.size()" + bucketList.size());
             }
 
             int i;
-            for (i = 0; i < actionNum && i < OFGlobal.OFP_MAX_ACTION_NUMBER_PER_GROUP; i++) {
-                action = actionList.get(i);
-                if (action == null) {
-                    data.writeZero(OFAction.MAXIMAL_LENGTH);
+            for (i = 0; i < bucketNum && i < OFGlobal.OFP_MAX_BUCKET_NUMBER_PER_GROUP; i++) {
+                bucket = bucketList.get(i);
+
+                if (bucket == null) {
+                    data.writeZero(OFBucket.MAXIMAL_LENGTH);
                 } else {
-                    action.writeTo(data);
-                    if (action.getLength() < OFAction.MAXIMAL_LENGTH) {
-                        data.writeZero(OFAction.MAXIMAL_LENGTH - action.getLength());
-                    }
+                    bucket.writeTo(data);
                 }
             }
-            if (i < OFGlobal.OFP_MAX_ACTION_NUMBER_PER_GROUP) {
-                data.writeZero((OFGlobal.OFP_MAX_ACTION_NUMBER_PER_GROUP - i) * OFAction.MAXIMAL_LENGTH);
+
+            // @tsf: if buckets_num less than six, pad zeros here
+            if (i < OFGlobal.OFP_MAX_BUCKET_NUMBER_PER_GROUP) {
+                data.writeZero((OFGlobal.OFP_MAX_BUCKET_NUMBER_PER_GROUP - i) *
+                                OFBucket.MAXIMAL_LENGTH);
             }
         }
     }
@@ -141,36 +151,34 @@ public class OFGroupMod extends OFMessage implements OFActionFactoryAware, Clone
         String string = super.toString();
         string += HexString.toHex(command) +
                     HexString.toHex(groupType) +
-                    HexString.toHex(actionNum) +
+                    HexString.toHex(bucketNum) +
                     HexString.byteZeroEnd(1) +
                     HexString.toHex(groupId) +
                     HexString.toHex(counterId) +
-                    HexString.byteZeroEnd(4);
+                    HexString.toHex(slotId) +
+                    HexString.byteZeroEnd(2);
 
-        if (actionList == null) {
-            string += HexString.byteZeroEnd(OFGlobal.OFP_MAX_ACTION_NUMBER_PER_GROUP * OFAction.MAXIMAL_LENGTH);
+        if (bucketList == null) {
+            string += HexString.byteZeroEnd(OFGlobal.OFP_MAX_BUCKET_NUMBER_PER_GROUP * OFBucket.MAXIMAL_LENGTH);
         } else {
-            OFAction action;
+            OFBucket bucket;
 
-            if (actionNum > actionList.size()) {
-                throw new RuntimeException("actionNum " + actionNum + " > actionList.size()" + actionList.size());
+            if (bucketNum > bucketList.size()) {
+                throw new RuntimeException("bucketNum " + bucketNum + " > bucketList.size()" + bucketList.size());
             }
 
             int i;
-            for (i = 0; i < actionNum && i < OFGlobal.OFP_MAX_ACTION_NUMBER_PER_GROUP; i++) {
-                action = actionList.get(i);
-                if (action == null) {
-                    string += HexString.byteZeroEnd(OFAction.MAXIMAL_LENGTH);
+            for (i = 0; i < bucketNum && i < OFGlobal.OFP_MAX_BUCKET_NUMBER_PER_GROUP; i++) {
+                bucket = bucketList.get(i);
+                if (bucket == null) {
+                    string += HexString.byteZeroEnd(OFBucket.MAXIMAL_LENGTH);
                 } else {
-                    string += action.toBytesString();
-                    if (action.getLength() < OFAction.MAXIMAL_LENGTH) {
-                        string += HexString.byteZeroEnd(OFAction.MAXIMAL_LENGTH - action.getLength());
-                    }
+                    string += bucket.toBytesString();
                 }
             }
-            if (i < OFGlobal.OFP_MAX_ACTION_NUMBER_PER_GROUP) {
+            if (i < OFGlobal.OFP_MAX_BUCKET_NUMBER_PER_GROUP) {
                 string += HexString.byteZeroEnd((OFGlobal
-                        .OFP_MAX_ACTION_NUMBER_PER_GROUP - i) * OFAction.MAXIMAL_LENGTH);
+                        .OFP_MAX_BUCKET_NUMBER_PER_GROUP - i) * OFBucket.MAXIMAL_LENGTH);
             }
         }
 
@@ -180,27 +188,25 @@ public class OFGroupMod extends OFMessage implements OFActionFactoryAware, Clone
     public String toString() {
         String string = super.toString();
         string += "; GroupMod:" +
-                "cmd=" + command +
+                "command=" + command +
                 ";type=" + groupType +
-                ";anum=" + actionNum +
-                ";gid=" + groupId +
-                ";cid=" + counterId;
+                ";bucketNum=" + bucketNum +
+                ";groupId=" + groupId +
+                ";counterId=" + counterId +
+                ";slotId=" + slotId;
 
-        if (actionList == null) {
-            string += "actionList=null";
+        if (bucketList == null) {
+            string += "bucketList=null";
         } else {
-            for (OFAction action : actionList) {
-                if (action != null) {
-                    string += ";act=" + action.toString();
+            for (OFBucket bucket : bucketList) {
+                if (bucket != null) {
+                    string += ";bucket=" + bucket.toString();
                 }
             }
         }
 
         return string;
     }
-
-
-
 
     public byte getCommand() {
         return command;
@@ -226,13 +232,13 @@ public class OFGroupMod extends OFMessage implements OFActionFactoryAware, Clone
     }
 
 
-    public byte getActionNum() {
-        return actionNum;
+    public byte getBucketNum() {
+        return bucketNum;
     }
 
 
-    public void setActionNum(byte actionNum) {
-        this.actionNum = actionNum;
+    public void setBucketNum(byte bucketNum) {
+        this.bucketNum = bucketNum;
     }
 
 
@@ -256,25 +262,41 @@ public class OFGroupMod extends OFMessage implements OFActionFactoryAware, Clone
     }
 
 
-    public List<OFAction> getActionList() {
-        return actionList;
+    public List<OFBucket> getBucketList() {
+        return bucketList;
     }
 
 
-    public void setActionList(List<OFAction> actionList) {
-        this.actionList = actionList;
+    public void setBucketList(List<OFBucket> bucketList) {
+        this.bucketList = bucketList;
     }
 
+    public short getSlotId() {
+        return slotId;
+    }
+
+    public void setSlotId(short slotId) {
+        this.slotId = slotId;
+    }
+
+    public void setBucketFactory(OFBucketFactory bucketFactory) {
+        this.bucketFactory = bucketFactory;
+    }
+
+    public OFBucketFactory getBucketFactory() {
+        return bucketFactory;
+    }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((actionFactory == null) ? 0 : actionFactory.hashCode());
-        result = prime * result + ((actionList == null) ? 0 : actionList.hashCode());
-        result = prime * result + actionNum;
+        result = prime * result + ((bucketFactory == null) ? 0 : bucketFactory.hashCode());
+        result = prime * result + ((bucketList == null) ? 0 : bucketList.hashCode());
+        result = prime * result + bucketNum;
         result = prime * result + command;
         result = prime * result + counterId;
+        result = prime * result + slotId;
         result = prime * result + groupId;
         result = prime * result + groupType;
         return result;
@@ -293,27 +315,30 @@ public class OFGroupMod extends OFMessage implements OFActionFactoryAware, Clone
             return false;
         }
         OFGroupMod other = (OFGroupMod) obj;
-        if (actionFactory == null) {
-            if (other.actionFactory != null) {
+        if (bucketFactory == null) {
+            if (other.bucketFactory != null) {
                 return false;
             }
-        } else if (!actionFactory.equals(other.actionFactory)) {
+        } else if (!bucketFactory.equals(other.bucketFactory)) {
             return false;
         }
-        if (actionList == null) {
-            if (other.actionList != null) {
+        if (bucketList == null) {
+            if (other.bucketList != null) {
                 return false;
             }
-        } else if (!actionList.equals(other.actionList)) {
+        } else if (!bucketList.equals(other.bucketList)) {
             return false;
         }
-        if (actionNum != other.actionNum) {
+        if (bucketNum != other.bucketNum) {
             return false;
         }
         if (command != other.command) {
             return false;
         }
         if (counterId != other.counterId) {
+            return false;
+        }
+        if (slotId != other.slotId) {
             return false;
         }
         if (groupId != other.groupId) {
@@ -329,23 +354,16 @@ public class OFGroupMod extends OFMessage implements OFActionFactoryAware, Clone
     public OFGroupMod clone() throws CloneNotSupportedException {
         OFGroupMod groupMod = (OFGroupMod) super.clone();
 
-        if (null != actionList
-                && 0 != actionList.size()
-                && 0 != actionNum) {
-            List<OFAction> neoActionList = new ArrayList<OFAction>();
-            for (OFAction ofAction: this.actionList) {
-                neoActionList.add(ofAction.clone());
+        if (null != bucketList
+                && 0 != bucketList.size()
+                && 0 != bucketNum) {
+            List<OFBucket> neoBucketList = new ArrayList<>();
+            for (OFBucket ofBucket: this.bucketList) {
+                neoBucketList.add(ofBucket.clone());
             }
-            groupMod.setActionList(neoActionList);
+            groupMod.setBucketList(neoBucketList);
         }
 
         return groupMod;
     }
-
-    @Override
-    public void setActionFactory(OFActionFactory actionFactory) {
-        this.actionFactory = actionFactory;
-    }
-
-
 }

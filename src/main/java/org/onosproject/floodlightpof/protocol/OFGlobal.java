@@ -81,6 +81,16 @@ public final class OFGlobal {
     public static final int OFP_MAX_ACTION_NUMBER_PER_GROUP = 6;
 
     /**
+     * Define the max bucket number in one group. {@value}. add by tsf.
+     */
+    public static final int OFP_MAX_BUCKET_NUMBER_PER_GROUP = 6;
+
+    /**
+     * Define the max action number in on group bucket. {@value}. add by tsf.
+     */
+    public static final int OFP_MAX_ACTION_NUMBER_PER_BUCKET = 6;
+
+    /**
      * Define the max action length in unit of byte. {@value}.
      */
     public static final int OFP_MAX_ACTION_LENGTH = 44;
