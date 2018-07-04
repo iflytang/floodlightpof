@@ -34,7 +34,8 @@ import org.onosproject.floodlightpof.util.HexString;
  *
  */
 public class OFActionGroup extends OFAction {
-    public static final int MINIMUM_LENGTH = OFAction.MINIMUM_LENGTH + 8;
+//    public static final int MINIMUM_LENGTH = OFAction.MINIMUM_LENGTH + 8;
+    public static final int MINIMUM_LENGTH = OFAction.MINIMUM_LENGTH + 4;   // tsf: 8B, don't pad zeros
 
     protected int groupId;
 
@@ -46,19 +47,18 @@ public class OFActionGroup extends OFAction {
     public void readFrom(ChannelBuffer data) {
         super.readFrom(data);
         this.groupId = data.readInt();
-        data.readBytes(4);
+        // data.readBytes(4);
     }
 
     public void writeTo(ChannelBuffer data) {
         super.writeTo(data);
         data.writeInt(groupId);
-        data.writeZero(4);
+        // data.writeZero(4);
     }
 
     public String toBytesString() {
         return super.toBytesString() +
-                HexString.toHex(groupId) +
-                HexString.byteZeroEnd(4);
+                HexString.toHex(groupId);
     }
 
     public String toString() {
