@@ -5,6 +5,7 @@ import org.onosproject.floodlightpof.protocol.action.OFAction;
 import org.onosproject.floodlightpof.protocol.factory.OFActionFactory;
 import org.onosproject.floodlightpof.util.HexString;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,6 +39,17 @@ public class OFBucket implements Cloneable {
         this.watch_slot_id = 0;
         this.watch_port = 0;
         this.watch_group = 0;
+        this.actionList = new ArrayList<>();
+    }
+
+    public OFBucket(short action_num, short weight, short watch_slot_id,
+                    byte watch_port, int watch_group, List<OFAction> actionList) {
+        this.action_num = action_num;
+        this.weight = weight;
+        this.watch_slot_id = watch_slot_id;
+        this.watch_port = watch_port;
+        this.watch_group = watch_group;
+        this.actionList = actionList;
     }
 
     public int getLengthU() {
