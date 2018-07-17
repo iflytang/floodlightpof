@@ -79,7 +79,8 @@ public class OFGroupMod extends OFMessage implements OFBucketFactoryAware, Clone
     public OFGroupMod() {
         super();
         this.type = OFType.GROUP_MOD;
-        this.length = U16.t(MINIMUM_LENGTH);
+//        this.length = U16.t(MINIMUM_LENGTH);
+        this.length = U16.t(MAXIMAL_LENGTH);     // tsf: store the max len
     }
 
     @Override
