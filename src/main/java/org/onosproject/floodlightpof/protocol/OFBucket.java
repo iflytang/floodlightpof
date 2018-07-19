@@ -35,10 +35,10 @@ public class OFBucket implements Cloneable {
 
     public OFBucket() {
         this.action_num = 0;
-        this.weight = 0;
+        this.weight = (short) 0xffff;    // only required for select groups
         this.watch_slot_id = 0;
-        this.watch_port = 0;
-        this.watch_group = 0;
+        this.watch_port = (byte) 0xff;   // OFPP_NONE
+        this.watch_group = 0xffffffff;   // OFPG_ANY
         this.actionList = new ArrayList<>();
     }
 
